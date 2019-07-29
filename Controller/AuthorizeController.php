@@ -17,7 +17,7 @@ use FOS\OAuthServerBundle\Model\ClientInterface;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use OAuth2\OAuth2;
 use OAuth2\OAuth2ServerException;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Twig\Environment;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,9 +63,9 @@ class AuthorizeController
     private $oAuth2Server;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var RequestStack
@@ -88,11 +88,6 @@ class AuthorizeController
     private $clientManager;
 
     /**
-     * @var string
-     */
-    private $templateEngineType;
-
-    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -106,37 +101,34 @@ class AuthorizeController
      * @param Form                     $authorizeForm
      * @param AuthorizeFormHandler     $authorizeFormHandler
      * @param OAuth2                   $oAuth2Server
-     * @param EngineInterface          $templating
+     * @param Environment              $twig
      * @param TokenStorageInterface    $tokenStorage
      * @param UrlGeneratorInterface    $router
      * @param ClientManagerInterface   $clientManager
      * @param EventDispatcherInterface $eventDispatcher
      * @param SessionInterface         $session
-     * @param string                   $templateEngineType
      */
     public function __construct(
         RequestStack $requestStack,
         Form $authorizeForm,
         AuthorizeFormHandler $authorizeFormHandler,
         OAuth2 $oAuth2Server,
-        EngineInterface $templating,
+        Environment $twig,
         TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        SessionInterface $session = null,
-        $templateEngineType = 'twig'
+        SessionInterface $session = null
     ) {
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->authorizeForm = $authorizeForm;
         $this->authorizeFormHandler = $authorizeFormHandler;
         $this->oAuth2Server = $oAuth2Server;
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->tokenStorage = $tokenStorage;
         $this->router = $router;
         $this->clientManager = $clientManager;
-        $this->templateEngineType = $templateEngineType;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -174,8 +166,8 @@ class AuthorizeController
             return $this->processSuccess($user, $formHandler, $request);
         }
 
-        return $this->templating->renderResponse(
-            'FOSOAuthServerBundle:Authorize:authorize.html.'.$this->templateEngineType,
+        return $this->twig->render(
+            'FOSOAuthServerBundle:Authorize:authorize.html.twig',
             array(
                 'form'   => $form->createView(),
                 'client' => $this->getClient(),
