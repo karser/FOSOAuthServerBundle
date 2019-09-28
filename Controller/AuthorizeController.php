@@ -168,7 +168,7 @@ class AuthorizeController
 
         return new Response(
             $this->twig->render(
-                '@FOSOAuthServerBundle/Authorize/authorize.html.twig',
+                '@FOSOAuthServer/Authorize/authorize.html.twig',
                 array(
                     'form'   => $form->createView(),
                     'client' => $this->getClient(),
