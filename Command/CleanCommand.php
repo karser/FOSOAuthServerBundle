@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -11,11 +13,11 @@
 
 namespace FOS\OAuthServerBundle\Command;
 
+use FOS\OAuthServerBundle\Model\AuthCodeManagerInterface;
+use FOS\OAuthServerBundle\Model\TokenManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use FOS\OAuthServerBundle\Model\TokenManagerInterface;
-use FOS\OAuthServerBundle\Model\AuthCodeManagerInterface;
 
 class CleanCommand extends Command
 {
@@ -50,7 +52,8 @@ The <info>%command.name%</info> command will remove expired OAuth2 tokens.
 
   <info>php %command.full_name%</info>
 EOT
-        );
+            )
+        ;
     }
 
     /**

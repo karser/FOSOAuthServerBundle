@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -28,13 +30,15 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
+
+        /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder->root('fos_oauth_server');
 
-        $supportedDrivers = array('orm', 'mongodb', 'propel', 'custom');
+        $supportedDrivers = ['orm', 'mongodb', 'propel', 'custom'];
 
         $rootNode
             ->validate()
-                ->always(function($v) {
+                ->always(function ($v) {
                     if ('custom' !== $v['db_driver']) {
                         return $v;
                     }
@@ -72,7 +76,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('refresh_token_class')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('auth_code_class')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('model_manager_name')->defaultNull()->end()
-            ->end();
+            ->end()
+        ;
 
         $this->addAuthorizeSection($rootNode);
         $this->addServiceSection($rootNode);
@@ -96,13 +101,14 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('name')->defaultValue('fos_oauth_server_authorize_form')->cannotBeEmpty()->end()
                                 ->arrayNode('validation_groups')
                                     ->prototype('scalar')->end()
-                                    ->defaultValue(array('Authorize', 'Default'))
+                                    ->defaultValue(['Authorize', 'Default'])
                                 ->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
     }
 
     private function addServiceSection(ArrayNodeDefinition $node)
@@ -121,12 +127,13 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('auth_code_manager')->defaultValue('fos_oauth_server.auth_code_manager.default')->end()
                             ->arrayNode('options')
                                 ->useAttributeAsKey('key')
-                                ->treatNullLike(array())
-                                ->prototype('scalar')->end()
+                                ->treatNullLike([])
+                                ->prototype('variable')->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
     }
 }

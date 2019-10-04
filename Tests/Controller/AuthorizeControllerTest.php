@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the FOSOAuthServerBundle package.
+ *
+ * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FOS\OAuthServerBundle\Tests\Controller;
 
 use FOS\OAuthServerBundle\Controller\AuthorizeController;
@@ -8,7 +19,7 @@ use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
 use FOS\OAuthServerBundle\Model\ClientInterface;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use OAuth2\OAuth2;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -23,7 +34,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Twig\Environment;
 
-class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
+class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
@@ -71,7 +82,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
     protected $clientManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
+     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -84,6 +95,16 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|Request
      */
     protected $request;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ParameterBag
+     */
+    protected $requestQuery;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ParameterBag
+     */
+    protected $requestRequest;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|UserInterface
@@ -139,7 +160,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $this->eventDispatcher = $this->getMockBuilder(EventDispatcher::class)
+        $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -161,18 +182,22 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             $this->session
         );
 
-        $this->request = $this->getMockBuilder(Request::class)
+        /** @var \PHPUnit_Framework_MockObject_MockObject&Request $request */
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $this->request->query = $this->getMockBuilder(ParameterBag::class)
+        $this->requestQuery = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $this->request->request = $this->getMockBuilder(ParameterBag::class)
+        $this->requestRequest = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
+        $request->query = $this->requestQuery;
+        $request->request = $this->requestRequest;
+        $this->request = $request;
         $this->user = $this->getMockBuilder(UserInterface::class)
             ->disableOriginalConstructor()
             ->getMock()
@@ -212,10 +237,8 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null)
         ;
 
-        $this->setExpectedException(
-            AccessDeniedException::class,
-            'This user does not have access to this section.')
-        ;
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('This user does not have access to this section.');
 
         $this->instance->authorizeAction($this->request);
     }
@@ -285,7 +308,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 '@FOSOAuthServer/Authorize/authorize.html.twig',
                 [
-                    'form'   => $this->formView,
+                    'form' => $this->formView,
                     'client' => $this->client,
                 ]
             )
@@ -339,7 +362,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true)
         ;
 
-        $randomScope = 'scope' . \random_bytes(10);
+        $randomScope = 'scope'.\random_bytes(10);
 
         $this->request
             ->expects($this->at(0))
@@ -444,7 +467,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 '@FOSOAuthServer/Authorize/authorize.html.twig',
                 [
-                    'form'   => $this->formView,
+                    'form' => $this->formView,
                     'client' => $this->client,
                 ]
             )
@@ -518,7 +541,7 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             )
         ;
 
-        $formName = 'formName' . \random_bytes(10);
+        $formName = 'formName'.\random_bytes(10);
 
         $this->form
             ->expects($this->once())
@@ -526,20 +549,20 @@ class AuthorizeControllerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($formName)
         ;
 
-        $this->request->query
+        $this->requestQuery
             ->expects($this->once())
             ->method('all')
             ->willReturn([])
         ;
 
-        $this->request->request
+        $this->requestRequest
             ->expects($this->once())
             ->method('has')
             ->with($formName)
             ->willReturn(false)
         ;
 
-        $randomScope = 'scope' . \random_bytes(10);
+        $randomScope = 'scope'.\random_bytes(10);
 
         $this->authorizeFormHandler
             ->expects($this->once())

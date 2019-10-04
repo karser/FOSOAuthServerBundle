@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -24,6 +26,9 @@ class TokenTest extends TestCase
 {
     /**
      * @dataProvider getTestHasExpiredData
+     *
+     * @param mixed $expiresAt
+     * @param mixed $expect
      */
     public function testHasExpired($expiresAt, $expect)
     {
@@ -35,18 +40,18 @@ class TokenTest extends TestCase
 
     public static function getTestHasExpiredData()
     {
-        return array(
-            array(time() + 60, false),
-            array(time() - 60, true),
-            array(null, false),
-        );
+        return [
+            [time() + 60, false],
+            [time() - 60, true],
+            [null, false],
+        ];
     }
 
     public function testExpiresIn()
     {
         $token = new Token();
 
-        $this->assertEquals(PHP_INT_MAX, $token->getExpiresIn());
+        $this->assertSame(PHP_INT_MAX, $token->getExpiresIn());
     }
 
     public function testExpiresInWithExpiresAt()
@@ -54,6 +59,6 @@ class TokenTest extends TestCase
         $token = new Token();
         $token->setExpiresAt(time() + 60);
 
-        $this->assertEquals(60, $token->getExpiresIn());
+        $this->assertSame(60, $token->getExpiresIn());
     }
 }

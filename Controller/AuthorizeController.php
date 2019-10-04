@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -29,6 +31,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Environment;
 
 /**
  * Controller handling basic authorization.
@@ -95,6 +98,7 @@ class AuthorizeController
     /**
      * This controller had been made as a service due to support symfony 4 where all* services are private by default.
      * Thus, this is considered a bad practice to fetch services directly from container.
+     *
      * @todo This controller could be refactored to not rely on so many dependencies
      *
      * @param RequestStack             $requestStack
@@ -151,6 +155,7 @@ class AuthorizeController
         $form = $this->authorizeForm;
         $formHandler = $this->authorizeFormHandler;
 
+        /** @var OAuthEvent $event */
         $event = $this->eventDispatcher->dispatch(
             OAuthEvent::PRE_AUTHORIZATION_PROCESS,
             new OAuthEvent($user, $this->getClient())
@@ -166,15 +171,12 @@ class AuthorizeController
             return $this->processSuccess($user, $formHandler, $request);
         }
 
-        return new Response(
-            $this->twig->render(
-                '@FOSOAuthServer/Authorize/authorize.html.twig',
-                array(
-                    'form'   => $form->createView(),
-                    'client' => $this->getClient(),
-                )
-            )
-        );
+        $data = [
+            'form' => $form->createView(),
+            'client' => $this->getClient(),
+        ];
+
+        return $this->renderAuthorize($data);
     }
 
     /**
@@ -203,7 +205,8 @@ class AuthorizeController
 
         try {
             return $this->oAuth2Server
-                ->finishClientAuthorization($formHandler->isAccepted(), $user, $request, $formHandler->getScope());
+                ->finishClientAuthorization($formHandler->isAccepted(), $user, $request, $formHandler->getScope())
+            ;
         } catch (OAuth2ServerException $e) {
             return $e->getHttpResponse();
         }
@@ -222,7 +225,7 @@ class AuthorizeController
     }
 
     /**
-     * @return ClientInterface.
+     * @return ClientInterface
      */
     protected function getClient()
     {
@@ -249,7 +252,20 @@ class AuthorizeController
     }
 
     /**
-     * @return null|Request
+     * @throws \RuntimeException
+     */
+    protected function renderAuthorize(array $data): Response
+    {
+        $response = $this->twig->render(
+            '@FOSOAuthServer/Authorize/authorize.html.twig',
+            $data
+        );
+
+        return $response instanceof Response ? $response : new Response($response);
+    }
+
+    /**
+     * @return Request|null
      */
     private function getCurrentRequest()
     {

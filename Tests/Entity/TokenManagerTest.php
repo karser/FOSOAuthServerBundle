@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -12,21 +14,22 @@
 namespace FOS\OAuthServerBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use FOS\OAuthServerBundle\Entity\TokenManager;
 use FOS\OAuthServerBundle\Entity\AccessToken;
+use FOS\OAuthServerBundle\Entity\TokenManager;
 use FOS\OAuthServerBundle\Model\TokenInterface;
 
 /**
  * @group time-sensitive
  *
  * Class TokenManagerTest
- * @package FOS\OAuthServerBundle\Tests\Entity
+ *
  * @author Nikola Petkanski <nikola@petkanski.com>
  */
-class TokenManagerTest extends \PHPUnit_Framework_TestCase
+class TokenManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
@@ -55,7 +58,7 @@ class TokenManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $this->entityManager = $this->getMockBuilder(EntityManagerInterface::class)
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;

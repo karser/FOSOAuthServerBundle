@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the FOSOAuthServerBundle package.
  *
@@ -11,12 +13,12 @@
 
 namespace FOS\OAuthServerBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CreateClientCommand extends Command
 {
@@ -59,7 +61,8 @@ The <info>%command.name%</info> command creates a new client.
 <info>php %command.full_name% [--redirect-uri=...] [--grant-type=...]</info>
 
 EOT
-            );
+            )
+        ;
     }
 
     /**
