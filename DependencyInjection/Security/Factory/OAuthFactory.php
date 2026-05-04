@@ -77,7 +77,7 @@ class OAuthFactory implements AuthenticatorFactoryInterface, SecurityFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function getKey()
+    public function getKey(): string
     {
         return 'fos_oauth';
     }
