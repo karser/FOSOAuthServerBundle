@@ -27,13 +27,13 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class OAuthFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
 {
-    public function createAuthenticator(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array|string
     {
-        $providerId = 'fos_oauth_server.security.authentication.authenticator.'.$id;
+        $providerId = 'fos_oauth_server.security.authentication.authenticator.'.$firewallName;
         $container
             ->setDefinition($providerId, new ChildDefinition('fos_oauth_server.security.authentication.authenticator'))
             ->replaceArgument(0, new Reference('fos_oauth_server.server'))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
+            ->replaceArgument(1, new Reference('security.user_checker.'.$firewallName))
             ->replaceArgument(2, new Reference($userProviderId))
         ;
 
